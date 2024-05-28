@@ -11,12 +11,9 @@ const Room = () => {
     // 들어가자마자 get [roomId] 해야함
     const [isScreenShare, setScreenShare] = useAtom(screenShareAtom);
     const videoRef = useRef<HTMLVideoElement | null>(null);
-    const [currentStream, setCurrentStream] = useState<MediaStream | null>(null);
+    const [currentStream, setCurrentStream] = useState(null);
     const [chatOpen, setChatOpen] = useState<boolean>(true);
     const stopScreenShare = () => {
-        if(!currentStream) {
-            return;
-        }
         currentStream.getTracks().forEach((track) => track.stop());
         setCurrentStream(null);
     };
@@ -32,7 +29,7 @@ const Room = () => {
             setScreenShare(false);
             setCurrentStream(null);
         });
-    }, [currentStream]);
+    }, currentStream);
 
     const startScreenShare = async () => {
         try {
@@ -58,7 +55,7 @@ const Room = () => {
             <main className={style.main}>
                 <div className={style.container}>
                     {/* 화면 공유하는 화면을 보이게 할 지, 통상의 맵을 보이게 할 지에 대한 atom 필요할 듯, 우선은 맵이 안 정해져서 화면 공유 화면이 보이도록 함 */}
-                    {currentStream && <ScreenWindow videoRef={videoRef} currentStream={currentStream} />}
+                    <ScreenWindow videoRef={videoRef} currentStream={currentStream} />
                     {chatOpen && <Chat className={style.chat} toggleChat={toggleChat} />}
                 </div>
                 <Menu
