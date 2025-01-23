@@ -61,6 +61,7 @@ export class MeetsInPhaserScene extends Phaser.Scene {
     private layerBlockWall!: Phaser.Tilemaps.TilemapLayer;
     private layerBlockFurniture!: Phaser.Tilemaps.TilemapLayer;
     private keyboardInput!: Phaser.Types.Input.Keyboard.CursorKeys;
+    private etcKeyboardInput: object | undefined
 
     constructor(roomId: string, user: IUser, socket: Socket) {
         super("MeetsInPhaserScene");
@@ -98,22 +99,25 @@ export class MeetsInPhaserScene extends Phaser.Scene {
 
     create(): void {
         const map = this.make.tilemap({ key: "map" });
+        const { width: canvasWidth, height:canvasHeight } = this.sys.game.canvas;
+        const width = canvasWidth / 4 - map.width * 16 / 2;
+        const height = canvasHeight / 4 - map.height * 16 / 2;
         const tileBase = map.addTilesetImage("base", "base")!;
         const tileIndoor = map.addTilesetImage("indoor", "indoor")!;
         const tileUrban = map.addTilesetImage("urban", "urban")!;
 
-        map.createLayer("ground", [tileBase, tileUrban], 0, 0);
-        this.layerBlockOutdoor = map.createLayer("block-outdoor", [tileBase, tileUrban], 0, 0)!;
-        this.layerBlockWall = map.createLayer("block-wall", [tileBase, tileUrban], 0, 0)!;
+        map.createLayer("ground", [tileBase, tileUrban], width, height);
+        this.layerBlockOutdoor = map.createLayer("block-outdoor", [tileBase, tileUrban], width, height)!;
+        this.layerBlockWall = map.createLayer("block-wall", [tileBase, tileUrban], width, height)!;
         this.layerBlockFurniture = map.createLayer(
             "block-furniture",
             [tileBase, tileIndoor],
-            0,
-            0,
+            width,
+            height,
         )!;
-        map.createLayer("furniture", [tileBase, tileIndoor, tileUrban], 0, 0);
-        const layerChairBack = map.createLayer("chair-back", [tileBase, tileIndoor], 0, 0);
-        map.createLayer("top-decorations", [tileBase, tileUrban], 0, 0);
+        map.createLayer("furniture", [tileBase, tileIndoor, tileUrban], width, height);
+        const layerChairBack = map.createLayer("chair-back", [tileBase, tileIndoor], width, height);
+        map.createLayer("top-decorations", [tileBase, tileUrban], width, height);
 
         layerChairBack!.setDepth(2);
 
@@ -130,6 +134,7 @@ export class MeetsInPhaserScene extends Phaser.Scene {
         this.setupAnimations();
 
         this.keyboardInput = this.input.keyboard!.createCursorKeys();
+        this.etcKeyboardInput = this.input.keyboard!.addKeys('W,A,S,D')
         this.input.keyboard!.disableGlobalCapture();
     }
 
@@ -231,7 +236,7 @@ export class MeetsInPhaserScene extends Phaser.Scene {
             player.moving = false;
         }
 
-        if (this.keyboardInput.left.isDown) {
+        if (this.keyboardInput.left.isDown || this.etcKeyboardInput?.A.isDown) {
             if (
                 !player.anims.isPlaying ||
                 player.anims.currentAnim?.key !== `walk-left-${this.myCharacterId}`
@@ -239,7 +244,7 @@ export class MeetsInPhaserScene extends Phaser.Scene {
                 player.play(`walk-left-${this.myCharacterId}`);
             }
             player.setVelocityX(-PLAYER_SPEED * 16);
-        } else if (this.keyboardInput.right.isDown) {
+        } else if (this.keyboardInput.right.isDown || this.etcKeyboardInput?.D.isDown) {
             if (
                 !player.anims.isPlaying ||
                 player.anims.currentAnim?.key !== `walk-right-${this.myCharacterId}`
@@ -247,7 +252,7 @@ export class MeetsInPhaserScene extends Phaser.Scene {
                 player.play(`walk-right-${this.myCharacterId}`);
             }
             player.setVelocityX(PLAYER_SPEED * 16);
-        } else if (this.keyboardInput.up.isDown) {
+        } else if (this.keyboardInput.up.isDown || this.etcKeyboardInput?.W.isDown) {
             if (
                 !player.anims.isPlaying ||
                 player.anims.currentAnim?.key !== `walk-up-${this.myCharacterId}`
@@ -255,7 +260,7 @@ export class MeetsInPhaserScene extends Phaser.Scene {
                 player.play(`walk-up-${this.myCharacterId}`);
             }
             player.setVelocityY(-PLAYER_SPEED * 16);
-        } else if (this.keyboardInput.down.isDown) {
+        } else if (this.keyboardInput.down.isDown || this.etcKeyboardInput?.S.isDown) {
             if (
                 !player.anims.isPlaying ||
                 player.anims.currentAnim?.key !== `walk-down-${this.myCharacterId}`
@@ -274,19 +279,19 @@ export class MeetsInPhaserScene extends Phaser.Scene {
     }
 
     private getCurrentDirection(): Direction {
-        if (this.keyboardInput.left.isDown) {
+        if (this.keyboardInput.left.isDown || this.etcKeyboardInput?.A.isDown) {
             return "left";
         }
 
-        if (this.keyboardInput.right.isDown) {
+        if (this.keyboardInput.right.isDown || this.etcKeyboardInput?.D.isDown) {
             return "right";
         }
 
-        if (this.keyboardInput.up.isDown) {
+        if (this.keyboardInput.up.isDown || this.etcKeyboardInput?.W.isDown) {
             return "up";
         }
 
-        if (this.keyboardInput.down.isDown) {
+        if (this.keyboardInput.down.isDown || this.etcKeyboardInput?.S.isDown) {
             return "down";
         }
         return null;
@@ -297,7 +302,11 @@ export class MeetsInPhaserScene extends Phaser.Scene {
             this.keyboardInput.left.isDown ||
             this.keyboardInput.right.isDown ||
             this.keyboardInput.up.isDown ||
-            this.keyboardInput.down.isDown
+            this.keyboardInput.down.isDown ||
+            this.etcKeyboardInput?.W.isDown || 
+            this.etcKeyboardInput?.A.isDown || 
+            this.etcKeyboardInput?.S.isDown || 
+            this.etcKeyboardInput?.D.isDown
         );
     }
 
@@ -306,7 +315,11 @@ export class MeetsInPhaserScene extends Phaser.Scene {
             this.keyboardInput.left.isUp &&
             this.keyboardInput.right.isUp &&
             this.keyboardInput.up.isUp &&
-            this.keyboardInput.down.isUp
+            this.keyboardInput.down.isUp && 
+            this.etcKeyboardInput?.W.isUp && 
+            this.etcKeyboardInput?.A.isUp && 
+            this.etcKeyboardInput?.S.isUp && 
+            this.etcKeyboardInput?.D.isUp
         );
     }
 
