@@ -23,9 +23,6 @@ dotenv.config();
                 schema: UserSchema,
             },
         ]),
-        ConfigModule.forRoot({
-            isGlobal: true,
-        }),
         forwardRef(() => UsersModule),
         PassportModule.register({
             defaultStrategy: "jwt",
@@ -35,12 +32,6 @@ dotenv.config();
             secret: process.env.JWT_SECRET,
             signOptions: {
                 expiresIn: "15m",
-            },
-        }),
-        JwtModule.register({
-            secret: process.env.JWT_REFRESH_SECRET,
-            signOptions: {
-                expiresIn: "30d",
             },
         }),
     ],

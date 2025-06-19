@@ -1,15 +1,16 @@
 import { BadRequestException, ForbiddenException, Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { INewUser, User } from "src/modules/users/schemas/user.schema";
 import { UsersRepository } from "src/modules/users/users.repository";
 import { JwtService } from "@nestjs/jwt";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly usersRepository: UsersRepository,
         private readonly jwtService: JwtService,
-        private readonly configService: ConfigService,
     ) {}
 
     private generateJwtPayload(user: User | INewUser) {
@@ -23,7 +24,7 @@ export class AuthService {
     private generateTokens(payload: any) {
         const access_token = this.jwtService.sign(payload, { expiresIn: "15m" });
         const refresh_token = this.jwtService.sign(payload, {
-            secret: this.configService.get("JWT_REFRESH_SECRET"),
+            secret: process.env.JWT_REFRESH_SECRET,
             expiresIn: "30d",
         });
         return { access_token, refresh_token };

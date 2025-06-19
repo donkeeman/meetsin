@@ -1,13 +1,15 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import { CookieOptions, Response } from "express";
 import { AuthGuard } from "@nestjs/passport";
+import dotenv from "dotenv";
 import { LoginRequest } from "src/common/types/request.type";
 import { JwtGuard, JwtRefreshGuard } from "../../common/guards/auth.guard";
 import { UsersService } from "src/modules/users/users.service";
 import { ResponseDto } from "src/common/interfaces/response.interface";
 import { UsersRepository } from "../users/users.repository";
+
+dotenv.config();
 
 @Controller("auth")
 export class AuthController {
@@ -16,17 +18,16 @@ export class AuthController {
     constructor(
         private readonly authService: AuthService,
         private readonly userService: UsersService,
-        private readonly configService: ConfigService,
         private readonly usersRepository: UsersRepository,
     ) {
-        const isPROD = this.configService.get("MODE") === "PROD";
+        const isPROD = process.env.MODE === "PROD";
         this.cookieOptions = {
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
             secure: isPROD,
             path: "/",
             ...(isPROD && {
                 sameSite: "none",
-                domain: `.${this.configService.get("CLIENT_URL").replace("https://", "")}`,
+                domain: `.${process.env.CLIENT_URL.replace("https://", "")}`,
             }),
             httpOnly: true, // 개발 환경에서는 false로 바꾸어 테스트
         };
@@ -41,7 +42,7 @@ export class AuthController {
     async googleAuthRedirect(@Req() req: LoginRequest, @Res() res: Response) {
         const { refresh_token } = await this.authService.signIn(req.user);
         res.cookie("refresh_token", refresh_token, this.cookieOptions);
-        res.status(302).redirect(this.configService.get("CLIENT_URL"));
+        res.status(302).redirect(process.env.CLIENT_URL);
     }
 
     @Get("/login/kakao")
@@ -53,7 +54,7 @@ export class AuthController {
     async kakaoAuthRedirect(@Req() req: LoginRequest, @Res() res: Response) {
         const { refresh_token } = await this.authService.signIn(req.user);
         res.cookie("refresh_token", refresh_token, this.cookieOptions);
-        res.status(302).redirect(this.configService.get("CLIENT_URL"));
+        res.status(302).redirect(process.env.CLIENT_URL);
     }
 
     @Get("/login/guest")
@@ -62,12 +63,10 @@ export class AuthController {
             ...this.cookieOptions,
             maxAge: 24 * 60 * 60 * 1000,
         };
-        const guestUser = await this.usersRepository.findUserById(
-            this.configService.get("GUEST_OBJECT_ID"),
-        );
+        const guestUser = await this.usersRepository.findUserById(process.env.GUEST_OBJECT_ID);
         const { refresh_token } = await this.authService.signIn(guestUser);
         res.cookie("refresh_token", refresh_token, guestCookieOptions);
-        res.status(302).redirect(this.configService.get("CLIENT_URL"));
+        res.status(302).redirect(process.env.CLIENT_URL);
     }
 
     @Get("/user")
