@@ -1,16 +1,18 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
     createSubscriptionToDB,
     deleteSubscriptionFromDB,
     createPushNotification,
+    getSubscriptionFromDB,
 } from "../repository/notification.repository";
 import { Subscription } from "@/types/subscription.type";
+import { QUERY_KEY } from "@/constants/queryKey.const";
 
 const getServiceWorkerStatus = async () => {
     return navigator.serviceWorker.ready;
 };
 
-export const getExistingSubscription = async () => {
+export const getSubscriptionFromBrowser = async () => {
     const serviceWorker = await getServiceWorkerStatus();
     return serviceWorker.pushManager.getSubscription();
 };
@@ -18,11 +20,11 @@ export const getExistingSubscription = async () => {
 export const startSubscription = async () => {
     try {
         if (!("PushManager" in window)) {
-            alert("푸시 알림 이 브라우저에서 지원 안 함");
+            alert("현재 브라우저에서 푸시 알림을 지원하지 않습니다");
             return;
         }
 
-        const existingSubscription = await getExistingSubscription();
+        const existingSubscription = await getSubscriptionFromBrowser();
 
         if (existingSubscription) {
             return; // 이미 구독 있음
@@ -39,7 +41,7 @@ export const startSubscription = async () => {
     } catch (error) {
         console.error(error);
         if (Notification.permission === "denied") {
-            alert("알림 허용해주세요");
+            alert("푸시 알림을 허용해주세요");
         }
     }
 };
@@ -58,7 +60,7 @@ const formatSubscription = async (subscription: PushSubscription) => {
 };
 
 export const cancelSubscription = async () => {
-    const existingSubscription = await getExistingSubscription();
+    const existingSubscription = await getSubscriptionFromBrowser();
 
     if (!existingSubscription) {
         return; // 취소할 구독이 없다.
@@ -67,6 +69,16 @@ export const cancelSubscription = async () => {
     existingSubscription.unsubscribe();
 
     return true;
+};
+
+export const useGetSubscriptionFromDB = () => {
+    return useQuery({
+        queryKey: QUERY_KEY.subscription,
+        queryFn: async () => {
+            const { data } = await getSubscriptionFromDB();
+            return data;
+        },
+    });
 };
 
 export const useCreateSubscriptionToDB = () => {

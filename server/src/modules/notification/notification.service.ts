@@ -19,12 +19,14 @@ export class NotificationService {
         );
     }
 
+    async getSubscription(userId: Types.ObjectId) {
+        const user = await this.userModel.findById(userId).lean();
+
+        return user?.notification || null;
+    }
+
     createSubscription(userId: Types.ObjectId, subscription: SubscriptionDTO) {
-        const user = this.userModel.updateOne(
-            { _id: userId },
-            { $addToSet: { notification: subscription } },
-        );
-        return user;
+        return this.userModel.updateOne({ _id: userId }, { $set: { notification: subscription } });
     }
 
     async deleteSubscription(userId: Types.ObjectId) {
