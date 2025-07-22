@@ -33,10 +33,11 @@
 <img src="https://github.com/user-attachments/assets/4427c70f-18ef-42e5-9230-9fccdbe4a8c6" width="600px" alt="타이머"/>
 
 <br>시간이 끝나면 종료음과 푸시 알림을 보내드려요.
+<br>(푸시 알림은 왼쪽 하단의 ‘알림 받기’ 버튼을 눌러 활성화되어 있는 경우에만 도착해요.)
 
 <img src="https://github.com/user-attachments/assets/be5e965c-8472-46af-ae0d-00f69c442a45" width="300px" alt="알림"/>
 
-(MEETSIN 화면을 벗어난 경우에만 푸시 알림 전송)
+MEETSIN 화면을 벗어난 경우에만 푸시 알림이 전송됩니다.
 
 <br>
 
@@ -44,7 +45,7 @@
 
 실시간 채팅으로 멤버들과 소통해 보세요. 질문을 나누거나 아이디어를 공유하기에 딱 좋아요.
 
-<img src="https://github.com/user-attachments/assets/0999528a-9d92-45dc-85de-9044c7709606" width="600px" alt="채팅"/>
+<img src="https://github.com/user-attachments/assets/a63dbcf2-3439-44bb-8522-087f065e43fd" width="604" alt="채팅" />
 
 ### 화면 공유
 
@@ -52,7 +53,7 @@
 
 화면을 공유하며 멤버들과 함께 문제를 해결해 보세요. 시각적인 자료로 학습 효과를 높일 수 있어요.
 
-<img src="https://github.com/user-attachments/assets/e147d359-ed64-4145-8528-8f9d89b13788" width="700px" alt="화면 공유하기"/>
+<img src="https://github.com/user-attachments/assets/4331df26-8af2-4f61-8e3b-23255d4178a5" width="600px" alt="화면 공유하기"/>
 
 <br><br>
 
@@ -60,7 +61,7 @@
 
 다른 멤버가 화면을 공유하면 오른쪽 상단의 '화면 공유 보기' 버튼이 활성화돼요.
 
-<img src="https://github.com/user-attachments/assets/63c1da1c-3e74-4d84-883c-a04d3c7d77d3" width="700px" alt="화면 공유 보기"/>
+<img src="https://github.com/user-attachments/assets/a47816e6-20bc-4268-8a04-70c28e230506" width="600px" alt="화면 공유 보기"/>
 
 <br><br>
 
